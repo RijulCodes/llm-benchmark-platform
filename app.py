@@ -7,9 +7,15 @@ import json
 app = FastAPI()
 
 @app.get("/benchmark")
-def benchmark(prompt: str):
+def benchmark(
+    prompt: str,
+    model: str = "llama3.2:3b"
+):
 
-    result = measure_generation(generate, prompt)
+    result = measure_generation(
+        lambda p: generate(p, model),
+        prompt
+    )
 
     return result
 
@@ -84,3 +90,28 @@ Return ONLY JSON matching:
         "success": False,
         "error": "Failed after 3 attempts"
     }
+
+@app.get("/compare")
+def compare(prompt: str):
+
+    models = [
+        "llama3.2:3b",
+        "mistral:7b"
+    ]
+
+    results = {}
+
+    for model in models:
+
+        benchmark_result = measure_generation(
+            lambda p: generate(p, model),
+            prompt
+        )
+
+        results[model] = {
+            "latency": benchmark_result["latency"],
+            "tokens": benchmark_result["tokens"],
+            "tokens_per_second": benchmark_result["tokens_per_second"]
+        }
+
+    return results
