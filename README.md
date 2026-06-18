@@ -24,3 +24,18 @@ A local LLM evaluation platform built using FastAPI and Ollama.
 ## Models
 
 - Llama 3.2 3B
+
+## Demo
+
+### API Overview
+
+![API Overview](assets/swagger-overview.png)
+
+### Structured Output Validation
+
+![Structured Output](assets/structured-output.png)
+
+### Benchmarking Metrics
+
+![Benchmark Results](assets/benchmark-results.png)
+Measures response latency, approximate token count, and throughput (tokens/sec) for local LLM inference
