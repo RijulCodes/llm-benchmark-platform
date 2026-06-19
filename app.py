@@ -145,7 +145,7 @@ async def compare(
 
     for model in resolved_models:
         benchmark_result = await measure_generation_async(
-            lambda p: generate_async(p, model, temperature=temperature, max_tokens=max_tokens),
+            lambda p, m=model: generate_async(p, m, temperature=temperature, max_tokens=max_tokens),
             prompt
         )
 

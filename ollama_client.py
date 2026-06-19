@@ -1,12 +1,12 @@
-import requests
 import httpx
 
 def get_installed_models():
     try:
-        response = requests.get("http://localhost:11434/api/tags", timeout=5)
-        if response.status_code == 200:
-            data = response.json()
-            return [m["name"] for m in data.get("models", [])]
+        with httpx.Client(timeout=5.0) as client:
+            response = client.get("http://localhost:11434/api/tags")
+            if response.status_code == 200:
+                data = response.json()
+                return [m["name"] for m in data.get("models", [])]
     except Exception:
         pass
     return []
@@ -40,13 +40,13 @@ def generate(prompt, model="llama3.2:3b", format=None, temperature=None, max_tok
     if options:
         payload["options"] = options
 
-    response = requests.post(
-        "http://localhost:11434/api/generate",
-        json=payload,
-        timeout=120
-    )
-    response.raise_for_status()
-    return response.json()
+    with httpx.Client(timeout=120.0) as client:
+        response = client.post(
+            "http://localhost:11434/api/generate",
+            json=payload
+        )
+        response.raise_for_status()
+        return response.json()
 
 async def generate_async(prompt, model="llama3.2:3b", format=None, temperature=None, max_tokens=None):
     payload = {
