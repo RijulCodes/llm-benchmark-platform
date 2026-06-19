@@ -5,6 +5,4 @@ httpx
 streamlit
 pandas
 matplotlib
-pytest
-pytest-asyncio
 psutil

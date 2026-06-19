@@ -8,7 +8,7 @@ from quality_evaluator import evaluate_quality
 
 def main():
     installed = get_installed_models()
-    MODELS = installed if installed else ["llama3.2:3b", "mistral:7b"]
+    MODELS = installed if installed else ["llama3.2:3b", "mistral:7b", "phi3:latest"]
     print(f"Detected models: {installed}")
     print(f"Beginning benchmark with models: {MODELS}\n")
 
@@ -23,19 +23,27 @@ def main():
     except FileNotFoundError:
         print("Warning: prompts/test_prompts.json not found. Using fallback prompts.")
         prompts = [
-            "Explain quantum computing in one sentence.",
-            "What is the capital of France?",
-            "Write a quick python function to calculate fibonacci numbers."
+            {"category": "Conceptual", "prompt": "Explain quantum computing in one sentence."},
+            {"category": "Factual", "prompt": "What is the capital of France?"},
+            {"category": "Coding", "prompt": "Write a quick python function to calculate fibonacci numbers."}
         ]
 
     results = []
 
-    for i, prompt in enumerate(prompts, start=1):
-        print(f"\nPrompt {i}/{len(prompts)}")
+    for i, p_entry in enumerate(prompts, start=1):
+        if isinstance(p_entry, dict):
+            prompt = p_entry["prompt"]
+            category = p_entry.get("category", "General")
+        else:
+            prompt = p_entry
+            category = "General"
+
+        print(f"\nPrompt {i}/{len(prompts)} [{category}]")
         print(f"Prompt content: {prompt}")
 
         prompt_result = {
-            "prompt": prompt
+            "prompt": prompt,
+            "category": category
         }
 
         for model in MODELS:
@@ -113,6 +121,27 @@ Generated on: `{report_time}`
         for model, metrics in averages.items():
             report_content += f"| **{model}** | {metrics['avg_latency']}s | {metrics['avg_tps']} tokens/s | {metrics['avg_ram']} MB | {metrics['avg_quality']}/10.0 |\n"
             
+        # Category breakdown
+        categories = sorted(list(set(r["category"] for r in results if "category" in r)))
+        if categories:
+            report_content += """
+## Per-Category Performance Breakdown
+
+| Model | Category | Avg Latency (s) | Avg Throughput (TPS) | Avg Quality Score (1-10) |
+| :--- | :--- | :---: | :---: | :---: |
+"""
+            for model in MODELS:
+                for cat in categories:
+                    cat_results = [r[model] for r in results if r.get("category") == cat and model in r]
+                    latencies = [res["latency"] for res in cat_results if "latency" in res]
+                    tps_vals = [res["tokens_per_second"] for res in cat_results if "tokens_per_second" in res]
+                    qualities = [res["quality_score"] for res in cat_results if "quality_score" in res]
+                    if latencies:
+                        avg_latency = round(sum(latencies) / len(latencies), 2)
+                        avg_tps = round(sum(tps_vals) / len(tps_vals), 2)
+                        avg_quality = round(sum(qualities) / len(qualities), 2)
+                        report_content += f"| **{model}** | {cat} | {avg_latency}s | {avg_tps} tokens/s | {avg_quality}/10.0 |\n"
+
         report_content += f"""
 ## Key Insights
 

@@ -139,7 +139,7 @@ async def compare(
     else:
         resolved_models = await get_installed_models_async()
         if not resolved_models:
-            resolved_models = ["llama3.2:3b", "mistral:7b"]
+            resolved_models = ["llama3.2:3b", "mistral:7b", "phi3:latest"]
 
     results = {}
 

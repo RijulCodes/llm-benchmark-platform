@@ -65,3 +65,29 @@ async def test_evaluate_quality_async_success(mock_generate_async):
     res = await evaluate_quality_async("What is 3+3?", "6", judge_model="llama")
     assert res["overall_score"] == 8.0
     assert res["feedback"] == "Good response."
+
+@patch("quality_evaluator.generate")
+def test_evaluate_quality_json_failure(mock_generate):
+    mock_generate.return_value = {
+        "response": "this is garbage text, not JSON"
+    }
+    res = evaluate_quality("What is 2+2?", "4", judge_model="llama")
+    assert res["overall_score"] == 0.0
+    assert "Evaluation failed" in res["feedback"]
+
+@pytest.mark.asyncio
+@patch("quality_evaluator.generate_async")
+async def test_evaluate_quality_async_json_failure(mock_generate_async):
+    mock_generate_async.return_value = {
+        "response": "bad response formatting"
+    }
+    res = await evaluate_quality_async("What is 3+3?", "6", judge_model="llama")
+    assert res["overall_score"] == 0.0
+    assert "Evaluation failed" in res["feedback"]
+
+@patch("psutil.process_iter")
+def test_get_ollama_memory_mb_failure(mock_process_iter):
+    mock_process_iter.side_effect = Exception("Simulated process lookup failure")
+    from benchmark import get_ollama_memory_mb
+    res = get_ollama_memory_mb()
+    assert res == 0.0

@@ -1,12 +1,34 @@
 [
-    "Explain binary search",
-    "Explain recursion",
-    "What is machine learning?",
-    "What is quicksort?",
-    "What is dynamic programming?",
-    "Write Python code for factorial",
-    "Explain linked lists",
-    "Explain BFS",
-    "Explain DFS",
-    "What is a hash table?"
+    {
+        "category": "Conceptual",
+        "prompt": "Explain the difference between supervised and unsupervised machine learning."
+    },
+    {
+        "category": "Conceptual",
+        "prompt": "Explain what a linked list is and how it differs from an array."
+    },
+    {
+        "category": "Algorithms",
+        "prompt": "Explain binary search, how it works, and its time complexity."
+    },
+    {
+        "category": "Algorithms",
+        "prompt": "Compare Breadth-First Search (BFS) and Depth-First Search (DFS) in graph traversal."
+    },
+    {
+        "category": "Coding",
+        "prompt": "Write a Python function to calculate the N-th Fibonacci number using memoization."
+    },
+    {
+        "category": "Coding",
+        "prompt": "Write a Python function to check if a string is a palindrome."
+    },
+    {
+        "category": "Factual",
+        "prompt": "What is the capital of France and what is its approximate population?"
+    },
+    {
+        "category": "Factual",
+        "prompt": "Who proposed the theory of relativity and in what year was it published?"
+    }
 ]

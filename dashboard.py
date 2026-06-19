@@ -57,12 +57,14 @@ with tab1:
             rows = []
             for entry in data:
                 prompt = entry.get("prompt", "")
+                category = entry.get("category", "General")
                 for key, val in entry.items():
-                    if key == "prompt":
+                    if key in ("prompt", "category"):
                         continue
                     if isinstance(val, dict) and "latency" in val:
                         rows.append({
                             "Prompt": prompt,
+                            "Category": category,
                             "Model": key,
                             "Latency": val.get("latency", 0.0),
                             "TPS": val.get("tokens_per_second", 0.0),
@@ -169,6 +171,32 @@ with tab1:
                     plt.tight_layout()
                     st.pyplot(fig)
 
+                # CATEGORY BREAKDOWN SECTION
+                if "Category" in df.columns:
+                    st.markdown("---")
+                    st.subheader("📚 Performance by Prompt Category")
+                    
+                    category_metrics = df.groupby(["Model", "Category"])[["Latency", "TPS", "Quality Score"]].mean().reset_index()
+                    
+                    col_cat1, col_cat2 = st.columns([1, 1])
+                    
+                    with col_cat1:
+                        st.dataframe(
+                            category_metrics.round(2),
+                            use_container_width=True
+                        )
+                    
+                    with col_cat2:
+                        fig, ax = plt.subplots(figsize=(6, 4))
+                        pivot_df = category_metrics.pivot(index="Category", columns="Model", values="Quality Score")
+                        pivot_df.plot(kind="bar", ax=ax, edgecolor="black")
+                        ax.set_ylabel("Quality Score (1-10)")
+                        ax.set_xlabel("Category")
+                        ax.grid(True, linestyle="--", alpha=0.5)
+                        plt.xticks(rotation=45)
+                        plt.tight_layout()
+                        st.pyplot(fig)
+
                 # BENCHMARK TABLE
                 st.subheader("Detailed Benchmark History")
                 st.dataframe(
@@ -195,7 +223,7 @@ with tab2:
 
     if not installed:
         st.warning("⚠️ Local Ollama registry not detected or offline. Using fallback defaults.")
-        installed = ["llama3.2:3b", "mistral:7b"]
+        installed = ["llama3.2:3b", "mistral:7b", "phi3:latest"]
 
     col1, col2 = st.columns([1, 2])
 
@@ -256,7 +284,7 @@ with tab2:
                     
                     # Core generator function
                     benchmark_result = await measure_generation_async(
-                        lambda p: generate_async(p, model, temperature=temperature, max_tokens=max_tokens),
+                        lambda p, m=model: generate_async(p, m, temperature=temperature, max_tokens=max_tokens),
                         prompt_input
                     )
                     

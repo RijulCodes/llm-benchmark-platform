@@ -40,35 +40,35 @@ A local LLM evaluation platform built using **FastAPI**, **Ollama**, **Pydantic*
 
 ## Architecture
 
-```text
-User Request
-      │
-      ▼
- FastAPI Endpoint
-      │
-      ▼
- Ollama Client
-      │
-      ▼
- Local LLM
-      │
-      ▼
- JSON Validation
- (Pydantic)
-      │
-      ▼
- Retry Logic
-      │
-      ▼
- Benchmark Metrics
-      │
-      ▼
- Streamlit Dashboard
+```mermaid
+graph TD
+    User([User Request]) --> FastAPI[FastAPI App app.py]
+    FastAPI --> Route1[/generate /summarize /compare /benchmark]
+    Route1 --> OllamaClient[Ollama Client ollama_client.py]
+    OllamaClient --> LocalEngine[(Local Ollama Engine)]
+    LocalEngine --> Response[Model Response]
+    Response --> PydanticValidation{Pydantic Schema Validation}
+    PydanticValidation -- Valid --> Metrics[Benchmark Profiler benchmark.py]
+    PydanticValidation -- Invalid --> Retry[Validation Retry Loop + Prompt Update]
+    Retry --> OllamaClient
+    Metrics --> ResultsDB[(Results JSON Database)]
+    ResultsDB --> Streamlit[Streamlit Dashboard dashboard.py]
+    ResultsDB --> MDReport[Markdown Reports benchmark_report.md]
 ```
 
 ---
 
-## Benchmark Results
+## Motivation & Performance Insights
+
+### Why Cognitive Quality Benchmarking?
+Most open-source LLM benchmarking platforms focus purely on hardware metrics like latency and throughput (tokens per second). However, a model that generates garbage text at 100 TPS isn't actually better than a model that generates precise, correct text at 20 TPS.
+
+To bridge this gap, this platform introduces an **LLM-as-a-Judge Cognitive Quality Evaluator** (`quality_evaluator.py`). It rates responses from 1.0 to 10.0 along three cognitive dimensions:
+1. **Correctness**: Technical accuracy and alignment with truth.
+2. **Clarity**: Structural readability and tone.
+3. **Completeness**: How thoroughly the response answers all constraints in the prompt.
+
+### Summary Metrics
 
 | Model | Avg Latency (s) | Avg Throughput (TPS) | Avg Peak Memory (MB) | Avg Quality Score (1-10) |
 | :--- | :---: | :---: | :---: | :---: |
@@ -76,11 +76,9 @@ User Request
 | **Mistral 7B** | 48.43s | 6.77 tokens/s | 45.80 MB | 8.31/10.0 |
 
 ### Key Findings
-
-* 📈 **Throughput**: `Llama 3.2 3B` achieved the highest generation speed (nearly **2× higher TPS** than `Mistral 7B`) on local CPU/GPU hardware.
-* ⚖️ **Quality**: `Llama 3.2 3B` provided slightly higher qualitative output scores as evaluated by our LLM judge model.
-* 💾 **RAM Consumption**: `Mistral 7B` was highly resource-efficient, demonstrating a **10% lower peak RAM footprint** than `Llama 3.2 3B` during inference.
-* 🔒 **Local Security**: Running Ollama locally guarantees complete privacy, with no prompt data sent to external API providers.
+* 🚀 **Throughput Efficiency**: `Llama 3.2 3B` offers outstanding inference speed, running nearly **2× faster in TPS** than `Mistral 7B` on standard local hardware.
+* ⚖️ **Speed vs. Quality Trade-off**: While `Llama 3.2 3B` scored slightly higher overall on conceptual explanations and factual recall, `Mistral 7B` showed higher quality density on complex multi-step coding prompts.
+* 💾 **Hardware Footprint**: `Mistral 7B` had a **10% lower peak RAM footprint** than `Llama 3.2 3B`, making it a superior choice for resource-constrained edge deployments.
 
 ---
 
@@ -149,8 +147,14 @@ venv\Scripts\activate
 
 ### Install Dependencies
 
+Install the core application packages:
 ```bash
 pip install -r requirements.txt
+```
+
+*(Optional)* Install development and testing dependencies:
+```bash
+pip install -r requirements-dev.txt
 ```
 
 ---
@@ -177,7 +181,7 @@ Execute the automated benchmark run:
 ```bash
 python benchmark_suite.py
 ```
-This queries the local Ollama instance using all detected models and saves precise metrics to `results/benchmark_results.json`.
+This queries the local Ollama instance using all detected models, saves raw metrics to `results/benchmark_results.json`, and outputs a polished Markdown analysis report at `results/benchmark_report.md` (which details per-model and per-category speed, RAM, and quality statistics).
 
 ### 3. Run the Analytics Dashboard
 Launch the Streamlit visualization dashboard:
