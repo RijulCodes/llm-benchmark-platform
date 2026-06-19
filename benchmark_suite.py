@@ -18,7 +18,7 @@ def main():
 
     # Try to load prompts, fallback to basic list if not found
     try:
-        with open("prompts/test_prompts.json", "r") as f:
+        with open("prompts/test_prompts.json", "r", encoding="utf-8") as f:
             prompts = json.load(f)
     except FileNotFoundError:
         print("Warning: prompts/test_prompts.json not found. Using fallback prompts.")
@@ -79,7 +79,7 @@ def main():
         results.append(prompt_result)
 
     os.makedirs("results", exist_ok=True)
-    with open("results/benchmark_results.json", "w") as f:
+    with open("results/benchmark_results.json", "w", encoding="utf-8") as f:
         json.dump(results, f, indent=4)
 
     print("\nBenchmark completed and results saved to results/benchmark_results.json.")
@@ -153,7 +153,7 @@ Generated on: `{report_time}`
     else:
         report_content = "# LLM Benchmark Report\n\nNo benchmark data found."
 
-    with open("results/benchmark_report.md", "w") as f:
+    with open("results/benchmark_report.md", "w", encoding="utf-8") as f:
         f.write(report_content)
 
     print("Markdown evaluation report generated at results/benchmark_report.md.")

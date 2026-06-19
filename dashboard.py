@@ -45,7 +45,7 @@ with tab1:
         )
     else:
         try:
-            with open(results_path, "r") as f:
+            with open(results_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
         except Exception as e:
             st.error(f"Failed to load benchmark results: {e}")
