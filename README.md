@@ -6,31 +6,28 @@ A local LLM evaluation platform built using **FastAPI**, **Ollama**, **Pydantic*
 
 ## Features
 
-* Local LLM inference using Ollama
-* FastAPI REST API
-* Structured JSON generation
-* Pydantic schema validation
-* Automatic retry mechanism for invalid outputs
-* Multi-model benchmarking
-* Automated benchmark suite
-* Streamlit analytics dashboard
-* Performance metrics collection:
-
-  * Latency
-  * Token Count
-  * Tokens Per Second (TPS)
+* **Asynchronous Web Service**: Fully async routing backend (`async def` using FastAPI & `httpx`) to handle heavy LLM inference queries concurrently without blocking threads.
+* **Systems Memory Profiling**: Tracks and logs process-level peak RAM utilization (Resident Set Size via `psutil`) for background model servers during active inference runs.
+* **LLM-as-a-Judge Evaluation**: Structured quality grading prompt framework (grading Correctness, Clarity, and Completeness) utilizing local models as judges.
+* **Streamlit Interactive UI**: Two-tab dashboard featuring visual run history graphs (Speed vs. Quality scatter plots, RAM usage) and a **Live Evaluator** tab with slider controls for Temperature and Max Tokens.
+* **Automated Reports**: Generates a clean markdown summary report (`results/benchmark_report.md`) on benchmark completion.
+* **Engine-Level Metrics**: Fetches exact generated token counts (`eval_count`) and precise durations directly from Ollama's response metadata.
+* **Robust Software Standards**: Structured JSON mode validations via Pydantic, error handlers on endpoints, a mock unit test suite, and GitHub Actions CI workflow configuration.
 
 ---
 
 ## Tech Stack
 
 * Python
-* FastAPI
-* Ollama
-* Pydantic
-* Streamlit
-* Matplotlib
-* Pandas
+* FastAPI (Async Web Framework)
+* Ollama (Local Model Engine)
+* Pydantic (Data Validation Schema)
+* Streamlit (Inference Dashboard)
+* Matplotlib (Performance Visualizations)
+* Pandas (Data Wrangling)
+* psutil (Process Memory Profiling)
+* httpx (Async HTTP Client)
+* pytest & pytest-asyncio (Unit & Integration Tests)
 
 ---
 
@@ -73,17 +70,17 @@ User Request
 
 ## Benchmark Results
 
-| Model        | Avg Latency (s) | Avg TPS |
-| ------------ | --------------- | ------- |
-| Llama 3.2 3B | 42.32           | 8.69    |
-| Mistral 7B   | 50.12           | 4.38    |
+| Model | Avg Latency (s) | Avg Throughput (TPS) | Avg Peak Memory (MB) | Avg Quality Score (1-10) |
+| :--- | :---: | :---: | :---: | :---: |
+| **Llama 3.2 3B** | 47.62s | 13.48 tokens/s | 50.36 MB | 8.32/10.0 |
+| **Mistral 7B** | 48.43s | 6.77 tokens/s | 45.80 MB | 8.31/10.0 |
 
 ### Key Findings
 
-* Llama 3.2 3B achieved lower latency on the tested hardware.
-* Llama 3.2 3B achieved nearly 2× higher throughput (TPS).
-* Mistral 7B generated shorter responses but was slower overall.
-* Local deployment allows benchmarking without relying on external APIs.
+* 📈 **Throughput**: `Llama 3.2 3B` achieved the highest generation speed (nearly **2× higher TPS** than `Mistral 7B`) on local CPU/GPU hardware.
+* ⚖️ **Quality**: `Llama 3.2 3B` provided slightly higher qualitative output scores as evaluated by our LLM judge model.
+* 💾 **RAM Consumption**: `Mistral 7B` was highly resource-efficient, demonstrating a **10% lower peak RAM footprint** than `Llama 3.2 3B` during inference.
+* 🔒 **Local Security**: Running Ollama locally guarantees complete privacy, with no prompt data sent to external API providers.
 
 ---
 
@@ -119,9 +116,11 @@ The Streamlit dashboard provides:
 
 Measures:
 
-* Response latency
+* Response latency (seconds)
 * Token count
 * Tokens per second (TPS)
+* Peak memory utilization (MB)
+* Cognitive quality alignment (1-10 score)
 
 ---
 
@@ -156,26 +155,44 @@ pip install -r requirements.txt
 
 ---
 
-## Running the API
+## Step-by-Step Running Guide
 
+To run the benchmarking platform successfully from scratch:
+
+### 1. Run the FastAPI Server
+Launch the local API server using Uvicorn:
 ```bash
 uvicorn app:app --reload
 ```
-
-Open:
-
+You can view the interactive swagger API documentation at:
 ```text
 http://127.0.0.1:8000/docs
 ```
 
----
+### 2. Run the Benchmark Suite
+> [!NOTE]
+> The benchmark results folder `results/` is excluded from git tracking. You **must** run the benchmark suite to generate the results file locally before launching the dashboard.
 
-## Running the Dashboard
+Execute the automated benchmark run:
+```bash
+python benchmark_suite.py
+```
+This queries the local Ollama instance using all detected models and saves precise metrics to `results/benchmark_results.json`.
 
+### 3. Run the Analytics Dashboard
+Launch the Streamlit visualization dashboard:
 ```bash
 streamlit run dashboard.py
 ```
 
+---
+
+## Running Unit Tests
+
+To execute the test suite (endpoints testing with mocked LLM queries, and math validation for the benchmark timings):
+```bash
+pytest
+```
 
 ---
 
