@@ -85,7 +85,7 @@ def main():
     print("\nBenchmark completed and results saved to results/benchmark_results.json.")
 
     # ----------------------------
-    # GENERATE MARKDOWN REPORT (Option D)
+    # GENERATE MARKDOWN REPORT 
     # ----------------------------
     averages = {}
     for model in MODELS:

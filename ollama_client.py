@@ -1,3 +1,4 @@
+# pyrefly: ignore [missing-import]
 import httpx
 
 def get_installed_models():
