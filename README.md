@@ -72,13 +72,14 @@ To bridge this gap, this platform introduces an **LLM-as-a-Judge Cognitive Quali
 
 | Model | Avg Latency (s) | Avg Throughput (TPS) | Avg Peak Memory (MB) | Avg Quality Score (1-10) |
 | :--- | :---: | :---: | :---: | :---: |
-| **Llama 3.2 3B** | 47.62s | 13.48 tokens/s | 50.36 MB | 8.32/10.0 |
-| **Mistral 7B** | 48.43s | 6.77 tokens/s | 45.80 MB | 8.31/10.0 |
+| **phi3:latest** | 34.62s | 9.14 tokens/s | 38.25 MB | 7.31/10.0 |
+| **mistral:7b** | 61.39s | 5.58 tokens/s | 41.62 MB | 8.33/10.0 |
+| **llama3.2:3b** | 26.37s | 13.31 tokens/s | 47.39 MB | 8.36/10.0 |
 
 ### Key Findings
-* 🚀 **Throughput Efficiency**: `Llama 3.2 3B` offers outstanding inference speed, running nearly **2× faster in TPS** than `Mistral 7B` on standard local hardware.
-* ⚖️ **Speed vs. Quality Trade-off**: While `Llama 3.2 3B` scored slightly higher overall on conceptual explanations and factual recall, `Mistral 7B` showed higher quality density on complex multi-step coding prompts.
-* 💾 **Hardware Footprint**: `Mistral 7B` had a **10% lower peak RAM footprint** than `Llama 3.2 3B`, making it a superior choice for resource-constrained edge deployments.
+* 🚀 **Throughput Efficiency**: `llama3.2:3b` offers the fastest overall inference speed, running at **13.31 TPS**—nearly **2.4× faster** than `mistral:7b`.
+* ⚖️ **Speed vs. Quality Trade-off**: `llama3.2:3b` maintains the highest overall quality score (**8.36/10.0**), while `phi3:latest` performs very well on coding tasks but struggles on long-context algorithmic comparisons (lowering its overall average to **7.31/10.0**).
+* 💾 **Hardware Footprint**: `phi3:latest` is highly resource-efficient, demonstrating the **lowest average peak RAM footprint** (**38.25 MB**), which is **19.3% lower** than `llama3.2:3b`.
 
 ---
 

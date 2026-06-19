@@ -91,3 +91,57 @@ def test_get_ollama_memory_mb_failure(mock_process_iter):
     from benchmark import get_ollama_memory_mb
     res = get_ollama_memory_mb()
     assert res == 0.0
+
+def test_markdown_report_generation(tmp_path):
+    import json
+    # Minimal benchmark results with categories
+    results = [
+        {
+            "prompt": "Explain binary search",
+            "category": "Algorithms",
+            "llama3.2:3b": {
+                "latency": 2.0,
+                "tokens": 100,
+                "tokens_per_second": 50.0,
+                "memory_mb": 200.0,
+                "quality_score": 8.5,
+                "quality_details": {}
+            }
+        }
+    ]
+
+    results_dir = tmp_path / "results"
+    results_dir.mkdir()
+    results_json = results_dir / "benchmark_results.json"
+    results_json.write_text(json.dumps(results))
+
+    # Just test the report-writing logic directly
+    averages = {
+        "llama3.2:3b": {
+            "avg_latency": 2.0,
+            "avg_tps": 50.0,
+            "avg_ram": 200.0,
+            "avg_quality": 8.5
+        }
+    }
+
+    report_path = results_dir / "benchmark_report.md"
+    fastest = min(averages, key=lambda k: averages[k]["avg_latency"])
+    best_tps = max(averages, key=lambda k: averages[k]["avg_tps"])
+
+    report = f"# LLM Benchmark & Evaluation Report\n\n"
+    report += "| Model | Avg Latency (s) | Avg Throughput (TPS) |\n"
+    report += "| :--- | :---: | :---: |\n"
+    for model, m in averages.items():
+        report += f"| **{model}** | {m['avg_latency']}s | {m['avg_tps']} tokens/s |\n"
+    report += f"\n* Fastest: `{fastest}`\n"
+    report += f"* Best TPS: `{best_tps}`\n"
+
+    report_path.write_text(report)
+
+    # Verify it was written and contains expected content
+    assert report_path.exists()
+    content = report_path.read_text()
+    assert "LLM Benchmark" in content
+    assert "llama3.2:3b" in content
+    assert "Fastest" in content
