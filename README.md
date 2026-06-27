@@ -35,6 +35,7 @@ A local LLM evaluation platform built using **FastAPI**, **Ollama**, **Pydantic*
 
 * Llama 3.2 3B
 * Mistral 7B
+* Phi 3.5
 
 ---
 
@@ -72,22 +73,34 @@ To bridge this gap, this platform introduces an **LLM-as-a-Judge Cognitive Quali
 
 | Model | Avg Latency (s) | Avg Throughput (TPS) | Avg Peak Memory (MB) | Avg Quality Score (1-10) |
 | :--- | :---: | :---: | :---: | :---: |
-| **phi3:latest** | 34.62s | 9.14 tokens/s | 38.25 MB | 7.31/10.0 |
-| **mistral:7b** | 61.39s | 5.58 tokens/s | 41.62 MB | 8.33/10.0 |
-| **llama3.2:3b** | 26.37s | 13.31 tokens/s | 47.39 MB | 8.36/10.0 |
+| **llama3.2:3b** | 28.05s | 13.94 tokens/s | 51.62 MB | 8.33/10.0 |
+| **phi3:latest** | 39.27s | 11.90 tokens/s | 46.92 MB | 7.49/10.0 |
+| **mistral:7b** | 49.33s | 6.46 tokens/s | 47.71 MB | 8.33/10.0 |
+| **mistral:latest** | 58.49s | 6.63 tokens/s | 49.21 MB | 8.35/10.0 |
+| **phi3.5:latest** | *Pending* | *Pending* | *Pending* | *Pending* |
 
 ### Key Findings
-* 🚀 **Throughput Efficiency**: `llama3.2:3b` offers the fastest overall inference speed, running at **13.31 TPS**—nearly **2.4× faster** than `mistral:7b`.
-* ⚖️ **Speed vs. Quality Trade-off**: `llama3.2:3b` maintains the highest overall quality score (**8.36/10.0**), while `phi3:latest` performs very well on coding tasks but struggles on long-context algorithmic comparisons (lowering its overall average to **7.31/10.0**).
-* 💾 **Hardware Footprint**: `phi3:latest` is highly resource-efficient, demonstrating the **lowest average peak RAM footprint** (**38.25 MB**), which is **19.3% lower** than `llama3.2:3b`.
+* 🚀 **Throughput Efficiency**: `llama3.2:3b` offers the fastest overall inference speed, running at **13.94 TPS**—nearly **2.15× faster** than `mistral:7b`.
+* ⚖️ **Speed vs. Quality Trade-off**: `mistral:latest` maintains the highest overall quality score (**8.35/10.0**), while `phi3:latest` performs very well on coding tasks but struggles on long-context conceptual comparisons (lowering its overall average to **7.49/10.0**).
+* 💾 **Hardware Footprint**: `phi3:latest` is highly resource-efficient, demonstrating the **lowest average peak RAM footprint** (**46.92 MB**), which is **9.1% lower** than `llama3.2:3b`.
 
 ---
 
 ## Dashboard
 
-![Dashboard](assets/dashboard.png)
-
 ![Dashboard](assets/dashboard2.png)
+
+![Dashboard](assets/dashboard3.png)
+
+![Dashboard](assets/dashboard4.png)
+
+![Dashboard](assets/dashboard5.png)
+
+![Dashboard](assets/dashboard6.png)
+
+![Dashboard](assets/dashboard7.png)
+
+![Dashboard](assets/dashboard1.png)
 
 The Streamlit dashboard provides:
 
@@ -111,7 +124,15 @@ The Streamlit dashboard provides:
 
 ### Benchmarking Metrics
 
-![Benchmark Results](assets/benchmark-results.png)
+![Benchmark Results](assets/benchmark1.png)
+
+![Benchmark Results](assets/benchmark2.png)
+
+### Comparison Metrics
+
+![Comparison Metrics](assets/compare1.png)
+
+![Comparison Metrics](assets/compare2.png)
 
 Measures:
 
