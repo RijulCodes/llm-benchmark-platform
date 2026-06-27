@@ -35,27 +35,8 @@ A local LLM evaluation platform built using **FastAPI**, **Ollama**, **Pydantic*
 
 * Llama 3.2 3B
 * Mistral 7B
-* Phi 3.5
-
----
-
-## Architecture
-
-```mermaid
-graph TD
-    User([User Request]) --> FastAPI[FastAPI App app.py]
-    FastAPI --> Route1[/generate /summarize /compare /benchmark]
-    Route1 --> OllamaClient[Ollama Client ollama_client.py]
-    OllamaClient --> LocalEngine[(Local Ollama Engine)]
-    LocalEngine --> Response[Model Response]
-    Response --> PydanticValidation{Pydantic Schema Validation}
-    PydanticValidation -- Valid --> Metrics[Benchmark Profiler benchmark.py]
-    PydanticValidation -- Invalid --> Retry[Validation Retry Loop + Prompt Update]
-    Retry --> OllamaClient
-    Metrics --> ResultsDB[(Results JSON Database)]
-    ResultsDB --> Streamlit[Streamlit Dashboard dashboard.py]
-    ResultsDB --> MDReport[Markdown Reports benchmark_report.md]
-```
+* Mistral (Latest)
+* Phi 3 (Latest)
 
 ---
 
@@ -77,7 +58,6 @@ To bridge this gap, this platform introduces an **LLM-as-a-Judge Cognitive Quali
 | **phi3:latest** | 39.27s | 11.90 tokens/s | 46.92 MB | 7.49/10.0 |
 | **mistral:7b** | 49.33s | 6.46 tokens/s | 47.71 MB | 8.33/10.0 |
 | **mistral:latest** | 58.49s | 6.63 tokens/s | 49.21 MB | 8.35/10.0 |
-| **phi3.5:latest** | *Pending* | *Pending* | *Pending* | *Pending* |
 
 ### Key Findings
 * 🚀 **Throughput Efficiency**: `llama3.2:3b` offers the fastest overall inference speed, running at **13.94 TPS**—nearly **2.15× faster** than `mistral:7b`.
